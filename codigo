@@ -1,0 +1,122 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+int id = 0;
+typedef struct arvore{
+	char   *nome;
+	char   *sexo;
+	int	   id;
+	struct arvore *pai;
+	struct arvore *irmao;
+	struct arvore *conjuge;	
+	struct arvore *filhop;		
+}Arv;
+
+Arv *buscaNo(Arv *raiz, int id){
+	Arv *no = raiz;
+	while (no != NULL && no->id != id){
+		if(no->irmao != NULL){
+			no = no->irmao;
+		}else{
+			no = no->filhop;
+		}
+	}
+
+	return no;
+}
+
+void inicializaNo(Arv *no){
+    no           = malloc (sizeof (struct arvore));
+    no->nome     = NULL;
+    no->sexo     = NULL;
+    no->id       = 0;
+    no->pai      = NULL;
+    no->filhop   = NULL;
+    no->conjuge  = NULL;
+    no->irmao    = NULL;
+}
+
+int pegaUltimoId(Arv *raiz){
+    Arv *no     = raiz;
+    int id      = 0;
+    
+    while (no != NULL ){
+      id++;
+      if(no->id > id){
+        id = no->id;
+      }
+               
+      if(no->irmao != NULL){
+              no = no->irmao;
+        printf("id = %d\n",id);  
+      }else{
+              no = no->filhop;
+      }
+    }
+    
+    return id;
+}
+
+void liberaMemoria(Arv *no) {
+  if (no != NULL) {
+    liberaMemoria(no->pai);
+    liberaMemoria(no->irmao);
+    liberaMemoria(no->conjuge);
+    liberaMemoria(no->filhop);
+    free(no);
+  }
+}
+
+Arv* gerarNo(Arv *pai, Arv *raiz, Arv *conj){
+  system("pause");
+  int prob;
+  Arv *no;
+  srand(time(NULL) * rand());
+
+  inicializaNo(no);
+  //no->sexo      = "";
+  
+  no->id        = id++; 
+  //no->nome      = NULL;
+  printf("1 id %d\n", id);
+  no->pai = pai;
+  
+  printf("2 id %d\n", id);
+        
+  prob = rand() % 10; 
+  if(prob >= 5){
+    printf("id (vai ter irmao)%d\n ", id);
+    no->irmao = gerarNo(no->pai, raiz, NULL);
+  }else{
+    no->irmao = NULL;
+  }
+
+  prob = rand() % 10; 
+  if(conj != NULL){
+    no->conjuge = conj;
+    no->filhop  = conj->filhop;
+  }else{
+    if(prob < 8){
+      no->conjuge = gerarNo(no, raiz, no);
+      no->filhop  = gerarNo(no, raiz, NULL);
+    }else{
+      no->conjuge = NULL;
+      no->filhop  = NULL;
+    }
+  }
+  return no;
+}
+
+int main(){
+  int prob, c = 0,i =0;
+  Arv *pai;
+  inicializaNo(pai);
+  pai->nome     = "pai";
+  pai->sexo     = "M";
+  pai->id       = 0;
+  pai->filhop   = gerarNo(pai, pai, NULL);
+  
+  return 0;
+}
